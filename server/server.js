@@ -27,6 +27,9 @@ app.use(morgan('tiny'));
 const staticRoot = path.join(__dirname, '..');
 app.use(express.static(staticRoot));
 
+// Also serve admin.html from server folder
+app.use(express.static(path.join(__dirname)));
+
 // Simple health check
 app.get('/_health', (req, res) => res.send({ ok: true }));
 
