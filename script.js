@@ -303,7 +303,7 @@ const caseStudiesCatalog = [
 // API base for contact submission. Automatically detects localhost or uses current domain
 const API_BASE = window.PREFICTION_API_BASE || (
   window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:3000'
+    ? 'http://localhost:4000'
     : window.location.origin
 );
 

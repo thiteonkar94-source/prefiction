@@ -4,38 +4,323 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Prefiction Admin - Submissions</title>
-  <style>body{font-family:system-ui,Segoe UI,Helvetica,Arial;margin:18px;background:#f7fafc;color:#0b1220}h1{font-size:20px}input,button{padding:8px 10px;margin-right:6px}</style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+    .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    .status-success { background: #ecfdf5; color: #065f46; border-left: 4px solid #10b981; }
+    .status-error { background: #fef2f2; color: #7f1d1d; border-left: 4px solid #ef4444; }
+    .status-loading { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+    .table-scroll { overflow-x: auto; }
+    .submission-row:hover { background: #f9fafb; }
+    .pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .pill-new { background: #dbeafe; color: #1e40af; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+  </style>
 </head>
-<body>
-  <h1>Submissions viewer</h1>
-  <p>Enter admin API key (default: <code>dev-secret</code>) and click <strong>Fetch</strong> to view submissions from <code>/admin/submissions</code>.</p>
-  <div>
-    <input id="apiKey" placeholder="x-api-key" value="dev-secret" />
-    <button id="fetchBtn">Fetch</button>
+<body class="bg-gradient-to-br from-blue-600 to-purple-700 min-h-screen p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8 text-white">
+      <h1 class="text-4xl font-bold mb-2">📊 Submissions Admin</h1>
+      <p class="text-blue-100">Manage and view all contact form submissions</p>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="glass-panel rounded-xl shadow-2xl p-6 mb-8">
+      <div class="flex flex-col md:flex-row gap-4 items-end">
+        <div class="flex-1">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Admin API Key</label>
+          <input 
+            id="apiKey" 
+            type="password" 
+            placeholder="Enter API key" 
+            value="dev-secret"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        <button 
+          id="fetchBtn"
+          class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-2 rounded-lg transition duration-200 shadow-lg"
+        >
+          🔄 Fetch Data
+        </button>
+      </div>
+
+      <!-- Status Message -->
+      <div id="status" class="mt-4 p-3 rounded-lg hidden"></div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer" class="glass-panel rounded-xl shadow-2xl p-6">
+      <!-- Table View -->
+      <div id="tableView" style="display: none;">
+        <div class="mb-4 flex justify-between items-center flex-wrap gap-3">
+          <h2 class="text-2xl font-bold text-gray-800">
+            <span id="countDisplay">0</span> Submissions
+          </h2>
+          <div class="flex gap-2">
+            <button id="exportJsonBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+              📄 Export JSON
+            </button>
+            <button id="exportPdfBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+              📕 Export PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="table-scroll border border-gray-200 rounded-lg overflow-hidden">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200">
+                <th class="px-6 py-3 text-left font-semibold text-gray-700">#</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-700">Name</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-700">Email</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-700">Company</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-700">Message</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-700">Submitted</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state">
+        <div class="text-6xl mb-4">📭</div>
+        <p class="text-lg font-semibold">No data loaded yet</p>
+        <p class="text-sm">Enter your API key and click "Fetch Data" to see submissions</p>
+      </div>
+    </div>
   </div>
-  <div id="status" style="margin-top:8px;color:#6b7280"></div>
-  <pre id="out" style="margin-top:12px;background:#fff;padding:12px;border-radius:8px;border:1px solid #e5e7eb;max-height:60vh;overflow:auto"></pre>
 
   <script>
-    const out = document.getElementById('out');
-    const status = document.getElementById('status');
-    document.getElementById('fetchBtn').addEventListener('click', async () => {
-      const key = document.getElementById('apiKey').value.trim();
-      if (!key) return status.textContent = 'Enter an API key';
-      status.textContent = 'Fetching...';
-      out.textContent = '';
+    // Load jsPDF libraries dynamically
+    function loadPDFLibraries() {
+      return Promise.all([
+        new Promise((resolve) => {
+          const script1 = document.createElement('script');
+          script1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+          script1.onload = resolve;
+          document.head.appendChild(script1);
+        }),
+        new Promise((resolve) => {
+          const script2 = document.createElement('script');
+          script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js';
+          script2.onload = resolve;
+          document.head.appendChild(script2);
+        })
+      ]);
+    }
+
+    let pdfLibrariesReady = false;
+    let pdfLibrariesPromise = loadPDFLibraries().then(() => {
+      pdfLibrariesReady = true;
+      return true;
+    });
+
+    const apiKeyInput = document.getElementById('apiKey');
+    const fetchBtn = document.getElementById('fetchBtn');
+    const statusDiv = document.getElementById('status');
+    const tableView = document.getElementById('tableView');
+    const emptyState = document.getElementById('emptyState');
+    const tableBody = document.getElementById('tableBody');
+    const countDisplay = document.getElementById('countDisplay');
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    let currentData = [];
+
+    function setStatus(message, type = 'info') {
+      statusDiv.className = `p-3 rounded-lg ${type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : 'status-loading'}`;
+      statusDiv.textContent = message;
+      statusDiv.style.display = 'block';
+    }
+
+    function formatDate(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderTable(submissions) {
+      if (!submissions || submissions.length === 0) {
+        tableView.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      tableView.style.display = 'block';
+      emptyState.style.display = 'none';
+      countDisplay.textContent = submissions.length;
+      tableBody.innerHTML = '';
+
+      submissions.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.className = 'submission-row border-b border-gray-200 hover:bg-gray-50 transition';
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-semibold text-gray-700">${index + 1}</td>
+          <td class="px-6 py-4 font-medium text-gray-900">${escapeHtml(row.name)}</td>
+          <td class="px-6 py-4 text-gray-600"><a href="mailto:${escapeHtml(row.email)}" class="text-blue-600 hover:underline">${escapeHtml(row.email)}</a></td>
+          <td class="px-6 py-4 text-gray-600">${escapeHtml(row.company || '—')}</td>
+          <td class="px-6 py-4 text-gray-600 max-w-xs truncate">${escapeHtml(row.message || '—')}</td>
+          <td class="px-6 py-4 text-gray-500 whitespace-nowrap text-xs">${formatDate(row.createdAt)}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    fetchBtn.addEventListener('click', async () => {
+      const key = apiKeyInput.value.trim();
+      if (!key) {
+        setStatus('⚠️ Enter an API key', 'error');
+        return;
+      }
+
+      setStatus('🔄 Fetching submissions...', 'loading');
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = '⏳ Loading...';
+
       try {
         const res = await fetch('/admin/submissions', { headers: { 'x-api-key': key } });
         if (!res.ok) {
           const json = await res.json().catch(() => ({}));
-          status.textContent = 'Failed: ' + (json && json.error ? json.error : res.statusText);
-          return;
+          throw new Error(json?.error || res.statusText);
         }
+
         const json = await res.json();
-        out.textContent = JSON.stringify(json.rows, null, 2);
-        status.textContent = 'OK — results loaded.';
+        currentData = json.rows || [];
+        renderTable(currentData);
+        setStatus(`✅ Loaded ${currentData.length} submission${currentData.length !== 1 ? 's' : ''} successfully`, 'success');
       } catch (err) {
-        status.textContent = 'Error: ' + (err && err.message ? err.message : 'network');
+        setStatus(`❌ Error: ${err.message}`, 'error');
+        tableView.style.display = 'none';
+        emptyState.style.display = 'block';
+      } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = '🔄 Fetch Data';
+      }
+    });
+
+    exportJsonBtn.addEventListener('click', () => {
+      const json = JSON.stringify(currentData, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `submissions-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    exportPdfBtn.addEventListener('click', () => {
+      if (currentData.length === 0) {
+        setStatus('⚠️ No data to export', 'error');
+        return;
+      }
+
+      exportPdfBtn.disabled = true;
+      exportPdfBtn.textContent = '⏳ Generating PDF...';
+
+      // Wait for PDF libraries to load
+      pdfLibrariesPromise.then(() => {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+          
+          // Title
+          doc.setFontSize(16);
+          doc.setTextColor(40, 40, 40);
+          doc.text('Form Submissions Report', 15, 15);
+          
+          // Metadata
+          doc.setFontSize(10);
+          doc.setTextColor(100, 100, 100);
+          doc.text('Prefiction Admin Panel', 15, 22);
+          doc.text('Generated: ' + new Date().toLocaleString(), 15, 27);
+          doc.text('Total Submissions: ' + currentData.length, 15, 32);
+          
+          // Prepare table data
+          const tableColumns = ['#', 'Name', 'Email', 'Company', 'Message', 'Date'];
+          const tableRows = currentData.map((row, idx) => [
+            String(idx + 1),
+            row.name.substring(0, 18),
+            row.email.substring(0, 22),
+            (row.company || '—').substring(0, 15),
+            (row.message || '—').substring(0, 20),
+            formatDate(row.createdAt)
+          ]);
+
+          // Use autoTable plugin
+          doc.autoTable({
+            head: [tableColumns],
+            body: tableRows,
+            startY: 38,
+            margin: { left: 10, right: 10 },
+            theme: 'grid',
+            headerStyles: {
+              fillColor: [102, 126, 234],
+              textColor: [255, 255, 255],
+              fontSize: 10,
+              fontStyle: 'bold',
+              halign: 'left'
+            },
+            bodyStyles: {
+              fontSize: 9,
+              textColor: [50, 50, 50]
+            },
+            alternateRowStyles: {
+              fillColor: [245, 245, 245]
+            },
+            columnStyles: {
+              0: { cellWidth: 8 },
+              1: { cellWidth: 30 },
+              2: { cellWidth: 35 },
+              3: { cellWidth: 25 },
+              4: { cellWidth: 35 },
+              5: { cellWidth: 30 }
+            }
+          });
+
+          // Footer
+          const pageCount = doc.internal.pages.length - 1;
+          for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('Generated by Prefiction Admin Panel', 15, doc.internal.pageSize.getHeight() - 5);
+          }
+
+          // Save PDF
+          const filename = 'submissions-' + new Date().toISOString().split('T')[0] + '.pdf';
+          doc.save(filename);
+          
+          setStatus('✅ PDF exported successfully!', 'success');
+          exportPdfBtn.disabled = false;
+          exportPdfBtn.textContent = '📕 Export PDF';
+        } catch (err) {
+          console.error('PDF Error:', err);
+          setStatus('❌ PDF export failed: ' + err.message, 'error');
+          exportPdfBtn.disabled = false;
+          exportPdfBtn.textContent = '📕 Export PDF';
+        }
+      }).catch(err => {
+        console.error('PDF Library Load Error:', err);
+        setStatus('❌ Failed to load PDF library: ' + err.message, 'error');
+        exportPdfBtn.disabled = false;
+        exportPdfBtn.textContent = '📕 Export PDF';
+      });
+    });
+
+    // Auto-fetch on load if API key is present
+    window.addEventListener('load', () => {
+      if (apiKeyInput.value) {
+        fetchBtn.click();
       }
     });
   </script>

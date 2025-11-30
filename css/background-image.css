@@ -1,5 +1,5 @@
 body {
-    background: linear-gradient(180deg, #f8f6f2 0%, #bebdb8 100%), url('assets/images/product-analytics-300x300.jpeg');
+    background: linear-gradient(180deg, #f8f6f2 0%, #bebdb8 100%), url('../assets/product-analytics-300x300.jpeg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
