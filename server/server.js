@@ -9,7 +9,10 @@ const path = require('path');
 const app = express();
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://prefiction_user:PASSWORD@cluster0.xxxxx.mongodb.net/prefiction';
+const mongoUri = process.env.MONGODB_URI;
+if (!mongoUri) {
+  console.warn('WARNING: MONGODB_URI not set. MongoDB connection will fail.');
+}
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
