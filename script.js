@@ -300,8 +300,12 @@ const caseStudiesCatalog = [
  * Injects the case studies into the new case studies section.
  */
 
-// API base for contact submission. When developing locally, the server listens on http://localhost:3000
-const API_BASE = window.PREFICTION_API_BASE || 'http://localhost:3000';
+// API base for contact submission. Automatically detects localhost or uses current domain
+const API_BASE = window.PREFICTION_API_BASE || (
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000'
+    : window.location.origin
+);
 
 /**
  * Attach contact form handler
