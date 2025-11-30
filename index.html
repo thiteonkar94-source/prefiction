@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prefiction — AI · Data · Product (Static HTML)</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/background-image.css">
+</head>
+<body class="antialiased bg-gray-50 text-gray-900" onload="initApp()">
+    <!-- Animated constellation network background -->
+    <canvas id="bg-constellation" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
+    <div id="root">
+        
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 cursor-pointer" onclick="setPage('home')" role="button" tabindex="0">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-gradient-to-br from-orange-600 to-pink-500 text-white font-bold">P</div>
+                            <div>
+                                <div class="font-extrabold text-lg leading-none">PREFICTION</div>
+                                <div class="text-xs text-gray-500">AI • Data • Product</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav class="hidden md:flex items-center gap-4 text-sm font-medium">
+                        <button id="nav-home" onclick="setPage('home')" class="nav-btn">Home</button>
+                        <button id="nav-services" onclick="setPage('services')" class="nav-btn">Services</button>
+                        <button id="nav-audience" onclick="setPage('audience')" class="nav-btn">Audiences</button>
+                        <button id="nav-products" onclick="setPage('products')" class="nav-btn">Case Studies</button>
+                        <button id="nav-about" onclick="setPage('about')" class="nav-btn">About</button>
+                        <button id="nav-contact" onclick="setPage('contact')" class="nav-cta nav-btn">Contact</button>
+                    </nav>
+
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" aria-expanded="false" aria-controls="mobile-nav-drawer" onclick="toggleMobileNav()" class="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-200">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M4 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mobile navigation overlay & drawer -->
+        <div id="mobile-nav-overlay" class="mobile-nav-overlay" onclick="closeMobileNav()" aria-hidden="true"></div>
+        <nav id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+            <div class="p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-600 to-pink-500 text-white flex items-center justify-center font-bold">P</div>
+                    <div>
+                        <div class="font-extrabold">PREFICTION</div>
+                        <div class="text-xs text-gray-500">AI • Data • Product</div>
+                    </div>
+                </div>
+                <button onclick="closeMobileNav()" aria-label="Close menu" class="p-2 rounded-md focus:outline-none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="px-4 pb-6 space-y-2">
+                <button id="m-nav-home" onclick="setPage('home'); closeMobileNav()" class="nav-btn w-full text-left">Home</button>
+                <button id="m-nav-services" onclick="setPage('services'); closeMobileNav()" class="nav-btn w-full text-left">Services</button>
+                <button id="m-nav-audience" onclick="setPage('audience'); closeMobileNav()" class="nav-btn w-full text-left">Audiences</button>
+                <button id="m-nav-products" onclick="setPage('products'); closeMobileNav()" class="nav-btn w-full text-left">Case Studies</button>
+                <button id="m-nav-about" onclick="setPage('about'); closeMobileNav()" class="nav-btn w-full text-left">About</button>
+                <button id="m-nav-contact" onclick="setPage('contact'); closeMobileNav()" class="nav-cta nav-btn w-full text-left">Contact</button>
+            </div>
+        </nav>
+
+        <main class="relative">
+            
+            <div id="page-home" class="page-transition page-active constellation-bg">
+                <section class="pt-12 md:pt-20 pb-8 lg:pb-20">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">Market-led demand that drives predictable pipeline — <span class="text-orange-600">from intent to closed-won</span></h1>
+                            <p class="mt-6 text-lg text-gray-600 max-w-2xl">We design and run account-focused demand programs that combine intent signals, creative and automation so your GTM teams convert higher-quality pipeline faster.</p>
+
+                            <div class="mt-8 flex gap-3 flex-wrap">
+                                <button onclick="setPage('contact')" class="inline-flex items-center gap-2 bg-orange-600 text-white px-5 py-3 rounded-md font-semibold shadow hover:bg-orange-700">Start a pilot</button>
+                                <button onclick="setPage('services')" class="inline-flex items-center gap-2 border border-gray-200 px-5 py-3 rounded-md text-sm hover:border-gray-300">See our solutions</button>
+                            </div>
+
+                            <div class="mt-10 grid gap-4 sm:grid-cols-2">
+                                <div class="bg-white p-4 rounded-lg shadow-sm"><div class="font-semibold">Demand & Growth</div><div class="text-sm text-gray-600 mt-2">Multi-channel programs that convert intent into qualified pipeline with measurable KPIs.</div></div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm"><div class="font-semibold">Account Activation</div><div class="text-sm text-gray-600 mt-2">ABM playbooks and personalised journeys to accelerate key account engagement.</div></div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm"><div class="font-semibold">Product Insights</div><div class="text-sm text-gray-600 mt-2">Realtime analytics and signal modelling to identify high-value accounts and moments to act.</div></div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm"><div class="font-semibold">Fast Delivery</div><div class="text-sm text-gray-600 mt-2">Pilot-first approach that proves impact quickly and scales into predictable programs.</div></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="bg-white p-6 rounded-2xl shadow-xl ring-1 ring-gray-100">
+                                <img src="assets/collection-1245976-600x400.jpg" alt="Product Analytics" loading="lazy" class="w-full h-44 sm:h-56 md:h-64 object-cover rounded-md" onerror="this.onerror=null;this.src='assets/images/fallback.jpeg'" />
+
+                                <div class="mt-4">
+                                    <div class="text-sm font-semibold">Product Analytics</div>
+                                    <div class="text-xs text-gray-500">Realtime insights &amp; funnel tracking</div>
+
+                                    <div class="mt-4 flex justify-between items-center">
+                                        <!-- <div>
+                                            <div class="text-xs text-gray-500">Active users</div>
+                                            <div class="text-lg font-bold">1.2M</div>
+                                        </div>
+                                        <div class="text-xs text-gray-500">+12% MoM</div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="py-12 constellation-bg" style="background:transparent;">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+                        <h2 class="text-3xl font-extrabold">Our Process</h2>
+                        <p class="text-gray-600 mt-2 max-w-2xl mx-auto">A market-led, pilot-first workflow that discovers high-intent segments, validates value quickly, then scales predictable demand and account engagement.</p>
+
+                        <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-2xl">🔎</div>
+                                <div class="text-xl font-bold mt-3">Discover</div>
+                                <div class="text-sm text-gray-600 mt-2">Map intent signals, identify high-fit segments and prioritise accounts for a focused pilot.</div>
+                                <div class="mt-3 text-xs text-gray-500">Output: Target account list & hypothesis (1–2 weeks)</div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-2xl">⚡</div>
+                                <div class="text-xl font-bold mt-3">Pilot</div>
+                                <div class="text-sm text-gray-600 mt-2">Run a short, measurable pilot combining creative, channels and scoring to prove the model.</div>
+                                <div class="mt-3 text-xs text-gray-500">Output: Pilot playbook & initial KPI uplift (4–8 weeks)</div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-2xl">📈</div>
+                                <div class="text-xl font-bold mt-3">Scale</div>
+                                <div class="text-sm text-gray-600 mt-2">Automate journeys, expand channels and scale to similar segments with repeatable playbooks.</div>
+                                <div class="mt-3 text-xs text-gray-500">Output: Scaling plan & dashboards (ongoing)</div>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <div class="text-2xl">🔧</div>
+                                <div class="text-xl font-bold mt-3">Operate</div>
+                                <div class="text-sm text-gray-600 mt-2">Run continuous optimisation, attribution and handoffs to sales so programs drive predictable pipeline.</div>
+                                <div class="mt-3 text-xs text-gray-500">Output: Ops runbook & SLA-backed reporting</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="py-12">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                        <h2 class="text-3xl font-extrabold">Featured Services</h2>
+                        <p class="text-gray-600 mt-2 max-w-xl">Our top AI‑powered offerings with custom logos & smooth animations.</p>
+
+                        <div id="featured-services-list" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            </div>
+                    </div>
+                </section>
+                
+                <section class="py-12">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                        <h2 class="text-3xl font-extrabold">Featured Audiences</h2>
+                        <p class="text-gray-600 mt-2 max-w-xl">Targeted segments ready for immediate campaign activation.</p>
+
+                        <div id="featured-audiences-list" class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            </div>
+                    </div>
+                </section>
+
+                
+                <section class="py-12 bg-gray-50">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div class="grid gap-8 lg:grid-cols-3">
+                            <div class="bg-gradient-to-br from-orange-50 to-white p-6 rounded-xl shadow-md border border-orange-100">
+                                <img src="assets/Our Mission.jpeg" alt="mission" loading="lazy" class="w-full h-36 sm:h-40 md:h-44 object-cover rounded-md mb-4" onerror="this.onerror=null;this.src='assets/images/fallback.jpeg'" />
+                                <h3 class="text-xl font-semibold">Our Mission</h3>
+                                <p class="mt-3 text-sm text-gray-600">Deliver measurable growth for product teams by combining data, engineering and design. We focus on high-quality leads, predictable outcomes and fast time-to-production.</p>
+                                <div class="mt-4 flex items-center gap-4">
+                                    <div class="text-sm text-gray-500">Active pilots</div>
+                                    <div class="font-bold text-lg">412</div>
+                                    <div class="ml-auto w-28 sm:w-36" id="home-chart-2">
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                <img src="assets/Our Vision.jpeg" alt="vision" loading="lazy" class="w-full h-36 sm:h-40 md:h-44 object-cover rounded-md mb-4" onerror="this.onerror=null;this.src='assets/images/fallback.jpeg'" />
+                                <h3 class="text-xl font-semibold">Our Vision</h3>
+                                <p class="mt-3 text-sm text-gray-600">Evolve with the digital landscape — blending creativity and analytics to build sustainable, scalable B2B products that customers love.</p>
+                                <div class="mt-4 flex items-center gap-4">
+                                    <div class="text-sm text-gray-500">Projects delivered</div>
+                                    <div class="font-bold text-lg">394</div>
+                                    <div class="ml-auto w-28 sm:w-36" id="home-chart-3">
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                                <h3 class="text-xl font-semibold">Why clients choose us</h3>
+                                <ul class="mt-3 text-sm text-gray-600 space-y-2">
+                                    <li><strong>Data-first:</strong> Intent signals and analytics guide every campaign.</li>
+                                    <li><strong>Multichannel:</strong> Integrated outreach across email, social and programmatic.</li>
+                                    <li><strong>Custom-fit:</strong> Strategies tailored to your product and buyer journey.</li>
+                                    <li><strong>Results-focused:</strong> We prioritise lead quality, conversion and ROI.</li>
+                                </ul>
+                                <button onclick="setPage('audience')" class="mt-4 text-orange-600 font-semibold hover:text-orange-700">Explore Audiences &rarr;</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-12 grid gap-6 lg:grid-cols-2">
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <h3 class="text-2xl font-extrabold">FAQs</h3>
+                                <div class="mt-4 grid gap-4" id="faq-list">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="py-12">
+                    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+                        <div class="relative overflow-hidden rounded-3xl p-6 sm:p-10 bg-gradient-to-r from-orange-50 via-orange-100 to-white ring-1 ring-orange-100">
+                            <div class="relative grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+                                <div>
+                                    <h3 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Ready to build?</h3>
+                                    <p class="mt-3 text-gray-700 max-w-xl">Tell us about your project and we'll propose a scoped plan that balances product, data and engineering — fast.</p>
+
+                                    <div class="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center">
+                                        <button onclick="setPage('contact')" class="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-5 py-3 rounded-md font-semibold shadow hover:bg-orange-700">Contact us</button>
+                                        <button onclick="setPage('services')" class="inline-flex items-center justify-center gap-2 border border-orange-200 px-4 py-3 rounded-md text-sm bg-white hover:bg-orange-50">Explore services</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <div id="page-services" class="page-transition constellation-bg">
+                <section class="py-12 constellation-bg" style="background:transparent;">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-extrabold">Services</h2>
+                        </div>
+
+                        <div class="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+                            <div class="lg:col-span-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <input id="service-query" oninput="handleServiceFilter()" placeholder="Search services" class="border rounded-md px-3 py-2 w-64 focus:scale-101 transition-transform" />
+                                        <button onclick="clearServiceFilter()" class="text-sm text-gray-500">Clear</button>
+                                    </div>
+
+                                    <div id="service-category-tabs" class="flex gap-2 items-center overflow-x-auto pb-2">
+                                        </div>
+                                </div>
+                                
+                                <p id="no-services-message" class="mt-10 text-center text-gray-500 hidden">No services match your search and filter criteria.</p>
+                                
+                                <div id="services-list" class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    </div>
+                            </div>
+
+                            <aside class="lg:col-span-1">
+                                <div class="bg-white p-6 rounded-lg shadow sticky top-24">
+                                    <div class="font-semibold">Quick Links</div>
+                                    <ul class="mt-3 space-y-2 text-sm text-gray-600">
+                                        <li><button onclick="setPage('contact')" class="text-left w-full text-orange-600 hover:text-orange-700">Contact us &rarr;</button></li>
+                                        <li><button onclick="setPage('about')" class="text-left w-full hover:text-orange-600">About</button></li>
+                                        <li><a href="#" onclick="event.preventDefault()" class="text-left w-full hover:text-orange-600">Case studies</a></li>
+                                    </ul>
+
+                                    <div class="mt-6">
+                                        <div class="font-semibold">Need a scoped pilot?</div>
+                                        <div class="text-sm text-gray-600 mt-2">We run short pilots that prove value quickly — request a proposal and we'll respond within 48 hours.</div>
+                                        <div class="mt-4">
+                                            <button onclick="setPage('contact')" class="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700">Request proposal</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <div id="page-services-detail" class="page-transition constellation-bg">
+                <section class="py-12">
+                    <div class="max-w-6xl mx-auto px-6 lg:px-8" id="service-detail-content">
+                        </div>
+                </section>
+            </div>
+            
+            
+            <div id="page-audience" class="page-transition constellation-bg">
+                <section class="py-12 constellation-bg" style="background:transparent;">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div class="text-center">
+                            <h2 class="text-3xl font-extrabold">Audiences</h2>
+                        </div>
+
+                        <div class="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+                            <div class="lg:col-span-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <input id="audience-query" oninput="handleAudienceFilter()" placeholder="Search audiences" class="border rounded-md px-3 py-2 w-64 focus:scale-101 transition-transform" />
+                                        <button onclick="clearAudienceFilter()" class="text-sm text-gray-500">Clear</button>
+                                    </div>
+
+                                    <div id="audience-category-tabs" class="flex gap-2 items-center overflow-x-auto pb-2">
+                                        <!-- category tabs can be populated dynamically in future -->
+                                    </div>
+                                </div>
+
+                                <p id="no-audiences-message" class="mt-10 text-center text-gray-500 hidden">No audiences match your search criteria.</p>
+
+                                <div id="audience-list" class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                    </div>
+                            </div>
+
+                            <aside class="lg:col-span-1">
+                                <div class="bg-white p-6 rounded-lg shadow sticky top-24">
+                                    <div class="font-semibold">Quick Links</div>
+                                    <ul class="mt-3 space-y-2 text-sm text-gray-600">
+                                        <li><button onclick="setPage('contact')" class="text-left w-full text-orange-600 hover:text-orange-700">Contact us &rarr;</button></li>
+                                        <li><button onclick="setPage('services')" class="text-left w-full hover:text-orange-600">Services</button></li>
+                                        <li><button onclick="setPage('about')" class="text-left w-full hover:text-orange-600">About</button></li>
+                                    </ul>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="page-audience-detail" class="page-transition constellation-bg">
+                <section class="py-12">
+                    <div class="max-w-6xl mx-auto px-6 lg:px-8" id="audience-detail-content">
+                        </div>
+                </section>
+            </div>
+
+
+            <div id="page-products" class="page-transition constellation-bg">
+                <section class="py-12 constellation-bg" style="background:transparent;">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+                        <h2 class="text-3xl font-extrabold">Case Studies</h2>
+                        <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Real-world results: How we help clients achieve measurable growth, pipeline, and product adoption.</p>
+                    </div>
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8 mt-10" id="case-studies-list">
+                        <!-- Case studies will be injected here by script.js -->
+                    </div>
+                </section>
+            </div>
+
+            <div id="page-products-detail" class="page-transition constellation-bg">
+                <section class="py-12">
+                    <div class="max-w-6xl mx-auto px-6 lg:px-8" id="product-detail-content">
+                        </div>
+                </section>
+            </div>
+
+            <div id="page-about" class="page-transition constellation-bg">
+                <section class="py-12 constellation-bg" style="background:transparent;">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h3 class="text-3xl font-extrabold">About PREFICTION</h3>
+                            <p class="mt-4 text-gray-600">We are a cross-functional team of engineers, data scientists and designers focused on building products that combine strong UX with reliable ML. We help teams move from prototypes to production while keeping product-market fit front-and-center.</p>
+
+                            <ul class="mt-6 grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                <li>Founded: 2016</li>
+                                <li>HQ: Remote / India</li>
+                                <li>Focus: SaaS, FinTech, HealthTech</li>
+                                <li>Clients: Startups → Enterprises</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <div class="bg-gray-50 rounded-xl p-6">
+                                <div class="font-semibold">Leadership</div>
+                                <div class="mt-4 grid gap-4" id="about-leadership-list">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <div id="page-contact" class="page-transition constellation-bg">
+                <section class="py-12">
+                    <div class="max-w-3xl mx-auto px-6 lg:px-8">
+                        <div class="bg-white p-8 rounded-2xl shadow">
+                            <h3 class="text-2xl font-extrabold">Let's build something together</h3>
+                            <p class="mt-2 text-gray-600">Tell us about your project and we'll propose a plan.</p>
+
+                            <form id="contact-form" class="mt-6 grid grid-cols-1 gap-4" novalidate>
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <input name="name" class="border border-gray-200 rounded-md px-4 py-3" placeholder="Your name" />
+                                    <input name="company" class="border border-gray-200 rounded-md px-4 py-3" placeholder="Company" />
+                                </div>
+                                <input name="email" class="border border-gray-200 rounded-md px-4 py-3" placeholder="Email" type="email" />
+                                <textarea name="message" class="border border-gray-200 rounded-md px-4 py-3" rows="5" placeholder="Brief description of your project"></textarea>
+                                <div class="flex items-center gap-4">
+                                    <button id="contact-submit" type="submit" class="bg-orange-600 text-white px-5 py-3 rounded-md font-semibold hover:bg-orange-700">Send message</button>
+                                    <div class="text-sm text-gray-500">Or email us at <a href="mailto:hello@prefiction.com" class="text-orange-600">hello@prefiction.com</a></div>
+                                </div>
+                                <div id="contact-status" class="mt-2 text-sm" aria-live="polite"></div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+        </main>
+        
+        <footer class="bg-gray-900 text-gray-300 border-t border-gray-800 mt-12">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+                <div class="flex items-center gap-3 mb-4 md:mb-0">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-600 to-pink-500 text-white flex items-center justify-center font-bold">P</div>
+                    <div>
+                        <div class="font-bold">PREFICTION</div>
+                        <div class="text-xs text-gray-400">AI • Data • Product</div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-400">
+                    <span class="inline-flex items-center gap-2 mr-4 align-middle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block align-middle w-6 h-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        <a href="mailto:hello@prefiction.com" class="hover:text-orange-400 transition align-middle">hello@prefiction.com</a>
+                    </span>
+                    <span class="inline-flex items-center gap-2 align-middle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline-block align-middle w-6 h-6 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm0 12a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2zm12-12a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm0 12a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                        <a href="tel:+919876543210" class="hover:text-orange-400 transition align-middle">+91 98765 43210</a>
+                    </span>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-6 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto px-6 lg:px-8 pb-6 gap-4">
+                <div>&copy; <span id="current-year">2024</span> PREFICTION — All rights reserved</div>
+                <div class="flex gap-3 flex-wrap bg-white/5 backdrop-blur-md rounded-xl px-4 py-2 shadow-lg animate-fade-in">
+                    <button onclick="setPage('home')" class="footer-link-anim">Home</button>
+                    <button onclick="setPage('services')" class="footer-link-anim">Services</button>
+                    <button onclick="setPage('audience')" class="footer-link-anim">Audiences</button>
+                    <button onclick="setPage('products')" class="footer-link-anim">Case Studies</button>
+                    <button onclick="setPage('about')" class="footer-link-anim">About</button>
+                    <button onclick="setPage('contact')" class="footer-link-anim">Contact</button>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+        <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: none; }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.7s cubic-bezier(.4,2,.3,1) 0.1s both;
+        }
+        .footer-link-anim {
+            color: #a3a3a3;
+            background: linear-gradient(90deg,rgba(251,146,60,0.08),rgba(236,72,153,0.08));
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.1rem;
+            font-weight: 500;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.18s;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04);
+            outline: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .footer-link-anim:hover, .footer-link-anim:focus {
+            color: #fb923c;
+            background: linear-gradient(90deg,rgba(251,146,60,0.18),rgba(236,72,153,0.18));
+            box-shadow: 0 4px 16px 0 rgba(251,146,60,0.10), 0 1.5px 8px 0 rgba(236,72,153,0.08);
+            transform: translateY(-2px) scale(1.06) rotate(-1deg);
+        }
+        .footer-link-anim:active {
+            color: #fff;
+            background: linear-gradient(90deg,rgba(251,146,60,0.32),rgba(236,72,153,0.32));
+            box-shadow: 0 2px 8px 0 rgba(251,146,60,0.12), 0 1.5px 8px 0 rgba(236,72,153,0.10);
+            transform: scale(0.98);
+        }
+        </style>
+        <script src="script.js"></script>
+<script>
+// Constellation animated background
+const canvas = document.getElementById('bg-particles');
+if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    window.addEventListener('resize', () => {
+        w = window.innerWidth; h = window.innerHeight;
+        canvas.width = w; canvas.height = h;
+    });
+    const particles = Array.from({length: 42}, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 2 + Math.random() * 2.5,
+        dx: (Math.random() - 0.5) * 0.6,
+        dy: (Math.random() - 0.5) * 0.6,
+        c: `rgba(${30+Math.random()*40},${20+Math.random()*40},${40+Math.random()*60},0.7)`
+    }));
+    function draw() {
+        ctx.clearRect(0,0,w,h);
+        // Draw lines between close particles
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i+1; j < particles.length; j++) {
+                const p1 = particles[i], p2 = particles[j];
+                const dist = Math.hypot(p1.x-p2.x, p1.y-p2.y);
+                if (dist < 120) {
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = 'rgba(80,80,120,' + (0.13 + 0.12*(1-dist/120)) + ')';
+                    ctx.lineWidth = 1.2;
+                    ctx.shadowColor = '#222a44';
+                    ctx.shadowBlur = 8;
+                    ctx.stroke();
+                }
+            }
+        }
+        // Draw particles
+        for (const p of particles) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, 2*Math.PI);
+            ctx.fillStyle = p.c;
+            ctx.shadowColor = '#222a44';
+            ctx.shadowBlur = 16;
+            ctx.fill();
+            p.x += p.dx; p.y += p.dy;
+            if (p.x < 0 || p.x > w) p.dx *= -1;
+            if (p.y < 0 || p.y > h) p.dy *= -1;
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+</script>
+</body>
+</html>

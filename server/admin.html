@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prefiction Admin - Submissions</title>
+  <style>body{font-family:system-ui,Segoe UI,Helvetica,Arial;margin:18px;background:#f7fafc;color:#0b1220}h1{font-size:20px}input,button{padding:8px 10px;margin-right:6px}</style>
+</head>
+<body>
+  <h1>Submissions viewer</h1>
+  <p>Enter admin API key (default: <code>dev-secret</code>) and click <strong>Fetch</strong> to view submissions from <code>/admin/submissions</code>.</p>
+  <div>
+    <input id="apiKey" placeholder="x-api-key" value="dev-secret" />
+    <button id="fetchBtn">Fetch</button>
+  </div>
+  <div id="status" style="margin-top:8px;color:#6b7280"></div>
+  <pre id="out" style="margin-top:12px;background:#fff;padding:12px;border-radius:8px;border:1px solid #e5e7eb;max-height:60vh;overflow:auto"></pre>
+
+  <script>
+    const out = document.getElementById('out');
+    const status = document.getElementById('status');
+    document.getElementById('fetchBtn').addEventListener('click', async () => {
+      const key = document.getElementById('apiKey').value.trim();
+      if (!key) return status.textContent = 'Enter an API key';
+      status.textContent = 'Fetching...';
+      out.textContent = '';
+      try {
+        const res = await fetch('/admin/submissions', { headers: { 'x-api-key': key } });
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({}));
+          status.textContent = 'Failed: ' + (json && json.error ? json.error : res.statusText);
+          return;
+        }
+        const json = await res.json();
+        out.textContent = JSON.stringify(json.rows, null, 2);
+        status.textContent = 'OK — results loaded.';
+      } catch (err) {
+        status.textContent = 'Error: ' + (err && err.message ? err.message : 'network');
+      }
+    });
+  </script>
+</body>
+</html>

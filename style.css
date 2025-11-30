@@ -1,0 +1,244 @@
+/* Extra transitions and animations for all content */
+.fade-in {
+    opacity: 0;
+    transform: translateY(32px) scale(0.98);
+    transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+}
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.card-hover-scale {
+    transition: transform 0.28s cubic-bezier(.4,0,.2,1), box-shadow 0.28s cubic-bezier(.4,0,.2,1), background 0.28s cubic-bezier(.4,0,.2,1);
+}
+.card-hover-scale:hover {
+    transform: scale(1.06) translateY(-8px) rotate(-1deg);
+    box-shadow: 0 16px 32px -4px rgba(249,115,22,0.12), 0 4px 16px -2px rgba(249,115,22,0.08);
+    background: linear-gradient(90deg, #fbc2eb 0%, #a1c4fd 100%);
+}
+.img-anim {
+    transition: box-shadow 0.5s, transform 0.5s;
+    box-shadow: 0 2px 12px 0 rgba(31,38,135,0.10);
+    border-radius: 1rem;
+}
+.img-anim:hover {
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+    transform: scale(1.04) rotate(-1deg);
+}
+.btn-anim {
+    transition: background 0.22s, color 0.22s, box-shadow 0.22s, transform 0.22s;
+    box-shadow: 0 1px 4px 0 rgba(251,146,60,0.08);
+}
+.btn-anim:hover, .btn-anim:focus {
+    background: linear-gradient(90deg, #fb923c, #fbc2eb);
+    color: #fff;
+    box-shadow: 0 4px 16px 0 rgba(251,146,60,0.10);
+    transform: translateY(-2px) scale(1.06);
+}
+.text-anim {
+    transition: color 0.22s, text-shadow 0.22s;
+}
+.text-anim:hover {
+    color: #fb923c;
+    text-shadow: 0 2px 8px #fbc2eb;
+}
+/* Section entrance animation */
+.section-animate {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1);
+}
+.section-animate.section-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Ensure all main pages have transparent background for constellation effect */
+.constellation-bg {
+    background: transparent !important;
+}
+/* Animated Constellation Network Background */
+#bg-constellation {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+/* --- Page Transition Styles (Hides non-active pages) --- */
+
+.page-transition {
+    transition: opacity 0.5s cubic-bezier(.4,0,.2,1), transform 0.5s cubic-bezier(.4,0,.2,1);
+    width: 100%;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+}
+
+.page-enter, .page-exit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+}
+.page-exit {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+}
+.page-enter {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+}
+.page-active {
+    opacity: 1;
+    transform: translateY(0);
+    position: relative;
+    pointer-events: auto;
+}
+
+/* --- Card Hover Effect --- */
+.card-hover-scale {
+    transition: transform 0.28s ease-out, box-shadow 0.28s ease-out;
+}
+.card-hover-scale:hover {
+    transform: scale(1.03) translateY(-6px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- FAQ Toggle --- */
+.faq-content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+}
+.faq-content.open {
+    max-height: 500px; /* Large enough for content */
+    opacity: 1;
+    padding-top: 0.75rem; /* mt-3 in Tailwind */
+}
+
+/* The original component used this helper class, keeping it for compatibility */
+.card-tilt {
+    transform: translateZ(0);
+}
+
+/* --- Navigation: animated underline, active pill, CTA --- */
+.nav-btn {
+    position: relative;
+    padding: 0.4rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+    color: inherit;
+    background: transparent;
+    font-weight: 600;
+}
+.nav-btn::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%) scaleX(0);
+    width: 56%;
+    height: 3px;
+    background: linear-gradient(90deg, #fb923c, #f97316);
+    border-radius: 4px;
+    transition: transform 0.28s cubic-bezier(.2,.9,.2,1);
+    transform-origin: center;
+    opacity: 0.95;
+}
+.nav-btn:hover::after,
+.nav-btn:focus::after {
+    transform: translateX(-50%) scaleX(1);
+}
+.nav-active {
+    background: rgba(249, 115, 22, 0.08); /* subtle orange pill */
+    color: #c2410c; /* stronger orange text */
+    box-shadow: 0 6px 18px rgba(249,115,22,0.06);
+}
+.nav-cta {
+    background: #fb923c; /* orange-400 */
+    color: #fff;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+}
+.nav-cta:hover {
+    background: #f97316; /* orange-500 */
+    transform: translateY(-2px);
+}
+
+/* Improve focus visibility for keyboard users */
+.nav-btn:focus {
+    outline: 3px solid rgba(251,146,60,0.14);
+    outline-offset: 2px;
+}
+
+/* --- Mobile nav overlay and drawer --- */
+.mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.36);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+    z-index: 40;
+}
+.mobile-nav-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.mobile-nav-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 86%;
+    max-width: 340px;
+    background: #fff;
+    transform: translateX(110%);
+    box-shadow: -20px 0 40px rgba(0,0,0,0.08);
+    transition: transform 0.28s cubic-bezier(.2,.9,.2,1);
+    z-index: 50;
+    overflow-y: auto;
+}
+.mobile-nav-drawer.open {
+    transform: translateX(0);
+}
+.mobile-nav-drawer .nav-btn {
+    padding: 0.75rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+.mobile-nav-drawer .nav-cta {
+    margin-top: 0.25rem;
+}
+
+/* Ensure drawer is hidden on desktop */
+@media (min-width: 768px) {
+    .mobile-nav-overlay, .mobile-nav-drawer { display: none; }
+}
+
+/* Mobile menu pop-in animation for items */
+.mobile-nav-drawer .px-4 button {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+}
+
+@keyframes mobile-pop {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-4px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
