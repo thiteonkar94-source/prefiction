@@ -71,6 +71,11 @@ app.get('/admin/submissions', async (req, res) => {
   }
 });
 
+// Serve admin.html explicitly at /admin.html (some hosts may not expose server folder statically)
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 app.listen(port, () => {
   console.log(`Prefiction server listening on http://localhost:${port}`);
   console.log(`Serving static files from ${staticRoot}`);
