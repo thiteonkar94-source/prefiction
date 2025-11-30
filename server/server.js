@@ -1,3 +1,4 @@
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -9,7 +10,10 @@ const path = require('path');
 const app = express();
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://thiteonkar17_db_user:npRsHJV3hJiyWrsA@cluster0.jhomc5v.mongodb.net/?appName=Cluster0';
+const mongoUri = process.env.MONGODB_URI;
+if (!mongoUri) {
+  console.warn('WARNING: MONGODB_URI environment variable not set. Database connection will fail.');
+}
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
