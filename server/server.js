@@ -9,14 +9,12 @@ const path = require('path');
 const app = express();
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI;
-if (!mongoUri) {
-  console.warn('WARNING: MONGODB_URI not set. MongoDB connection will fail.');
-}
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://prefiction_user:j@yEsh@@@3@prefiction0.o2wdktl.mongodb.net/?appName=prefiction0';
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).catch(err => console.error('MongoDB connection error:', err));
+}).then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 const port = process.env.PORT || 3000;
 
 // Basic middleware
