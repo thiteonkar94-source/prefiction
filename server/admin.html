@@ -1,3 +1,43 @@
+  // Password Protection (verify via server endpoint)
+  const loginForm = document.getElementById('loginForm');
+  loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const password = adminPassword.value.trim();
+  if (!password) {
+  showLoginError('Please enter a password');
+  return;
+  }
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Checking...';
+  try {
+  const resp = await fetch('/admin/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+  });
+  if (resp.ok) {
+          hideLoginError();
+          loginModal.style.display = 'none';
+          adminPanel.style.display = 'block';
+          adminPassword.value = '';
+  } else {
+          showLoginError('❌ Incorrect password. Try again.');
+          adminPassword.value = '';
+  }
+  } catch (err) {
+  console.error('Verify request failed', err);
+  showLoginError('Server error. Please try again later.');
+  } finally {
+  loginBtn.disabled = false;
+  loginBtn.textContent = 'Unlock Admin Panel';
+  }
+  });
+  // Allow Enter key to submit login
+  adminPassword.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+  loginBtn.click();
+  }
+  });
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,15 +61,17 @@
 <body class="bg-gradient-to-br from-blue-600 to-purple-700 min-h-screen p-4 md:p-8">
   <!-- Password Login Modal -->
   <div id="loginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-    <div class="glass-panel rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+    <form id="loginForm" class="glass-panel rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4" autocomplete="on">
       <h2 class="text-2xl font-bold text-gray-800 mb-2">🔐 Admin Access</h2>
       <p class="text-gray-600 mb-6">Enter the admin password to continue</p>
       
       <div class="mb-4">
         <input 
           id="adminPassword" 
+          name="password"
           type="password" 
           placeholder="Enter admin password" 
+          autocomplete="current-password"
           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
@@ -38,11 +80,12 @@
       
       <button 
         id="loginBtn"
+        type="submit"
         class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg"
       >
         Unlock Admin Panel
       </button>
-    </div>
+    </form>
   </div>
 
   <!-- Main Admin Panel (hidden until login) -->
