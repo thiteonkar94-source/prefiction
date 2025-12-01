@@ -107,6 +107,14 @@ function requireAdminAuth(req, res, next) {
   // Otherwise check for admin session cookie
   const cookieHeader = req.get('cookie') || '';
   const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('admin_sid='));
+  // Log minimal cookie diagnostics for debugging (mask actual value)
+  try {
+    const hasSid = !!match;
+    const cookieHeaderLen = cookieHeader ? cookieHeader.length : 0;
+    console.log('[DEBUG] requireAdminAuth - cookieHeaderLen=', cookieHeaderLen, 'has_admin_sid=', hasSid);
+  } catch (e) {
+    console.log('[DEBUG] requireAdminAuth - cookie diagnostic failed');
+  }
   if (!match) return res.status(401).json({ error: 'unauthorized' });
   const sid = match.split('=')[1];
   if (!isSessionValid(sid)) return res.status(401).json({ error: 'unauthorized' });
@@ -127,13 +135,13 @@ app.get('/admin/submissions', requireAdminAuth, async (req, res) => {
   }
 });
 
-// Allow POST as well for environments that proxy or block GET requests
+// Some hosts/proxies may block GET requests to API-like paths; accept POST as a mirror for compatibility
 app.post('/admin/submissions', requireAdminAuth, async (req, res) => {
   try {
     const rows = await Submission.find().sort({ createdAt: -1 });
     res.json({ rows });
   } catch (err) {
-    console.error('DB read failed (POST)', err);
+    console.error('DB read failed (POST mirror)', err);
     res.status(500).json({ error: 'internal server error' });
   }
 });
@@ -174,6 +182,12 @@ app.post('/admin/verify', (req, res) => {
         };
         if (process.env.NODE_ENV === 'production') cookieOpts.secure = true;
         res.cookie('admin_sid', sid, cookieOpts);
+        // Minimal debug log: do not print the full session id
+        try {
+          console.log('[DEBUG] /admin/verify - set admin_sid cookie (sidLen=', (sid && sid.length) || 0, ', opts=', Object.keys(cookieOpts), ')');
+        } catch (e) {
+          console.log('[DEBUG] /admin/verify - cookie log failed');
+        }
       } catch (err) {
         console.error('Session create failed', err);
       }
