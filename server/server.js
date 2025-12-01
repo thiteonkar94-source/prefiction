@@ -17,11 +17,29 @@ if (!mongoUri) {
   console.error('MONGODB_URI environment variable not set. Exiting.');
   process.exit(1);
 }
+
+console.log('🔗 Connecting to MongoDB...');
+let mongoConnected = false;
+
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 10000,
+  connectTimeoutMS: 10000
+}).then(() => {
+  console.log('✅ MongoDB connected successfully');
+  mongoConnected = true;
+}).catch(err => {
+  console.error('❌ MongoDB connection error:', err.message);
+  // Don't exit immediately, try to reconnect
+  setTimeout(() => {
+    if (!mongoConnected) {
+      console.error('❌ MongoDB still not connected after retry, exiting');
+      process.exit(1);
+    }
+  }, 5000);
+});
+
 const port = process.env.PORT || 3000;
 
 // Basic middleware with CSP configured for external scripts and inline handlers
@@ -58,6 +76,13 @@ app.get('/_health', (req, res) => res.send({ ok: true }));
 // POST endpoint to receive contact form submissions
 app.post('/api/contact', async (req, res) => {
   console.log('📨 Contact form received:', JSON.stringify(req.body));
+  console.log('🔗 MongoDB connection state:', mongoose.connection.readyState, '(0=disconnected, 1=connected, 2=connecting, 3=disconnecting)');
+  
+  if (mongoose.connection.readyState !== 1) {
+    console.error('❌ MongoDB not connected, readyState:', mongoose.connection.readyState);
+    return res.status(503).json({ error: 'Database temporarily unavailable' });
+  }
+  
   const { name, email, company, message } = req.body || {};
 
   if (!email || !name) {
