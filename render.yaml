@@ -10,13 +10,5 @@ services:
     envVars:
       - key: PORT
         value: "3000"
-services:
-  - type: web
-    name: prefiction-web
-    env: node
-    region: oregon
-    plan: free
-    branch: main
-    buildCommand: cd server && npm install
     startCommand: node server/server.js
     autoDeploy: true
