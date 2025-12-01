@@ -340,11 +340,14 @@ function attachContactFormHandler() {
         setStatus('');
 
         try {
+            console.log('📤 Submitting contact form to:', API_BASE + '/api/contact', { name, email, company, message });
             const res = await fetch(API_BASE + '/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
                 body: JSON.stringify({ name, company, email, message })
             });
+            console.log('📥 Response status:', res.status, 'Headers:', res.headers);
 
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
