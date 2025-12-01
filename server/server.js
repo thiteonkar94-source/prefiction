@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const Submission = require('./models/Submission');
 const path = require('path');
 const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use(helmet({
 app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use(cookieParser());
 app.use(morgan('tiny'));
 
 // Serve project static files (for local development). This lets you open the site via the server
@@ -121,6 +123,24 @@ app.get('/admin/submissions', requireAdminAuth, async (req, res) => {
     res.json({ rows });
   } catch (err) {
     console.error('DB read failed', err);
+    res.status(500).json({ error: 'internal server error' });
+  }
+});
+
+// DELETE endpoint to remove a submission by ID
+app.delete('/admin/submissions/:id', requireAdminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: 'submission id required' });
+    }
+    const result = await Submission.findByIdAndDelete(id);
+    if (!result) {
+      return res.status(404).json({ error: 'submission not found' });
+    }
+    res.json({ ok: true, message: 'submission deleted' });
+  } catch (err) {
+    console.error('DB delete failed', err);
     res.status(500).json({ error: 'internal server error' });
   }
 });
