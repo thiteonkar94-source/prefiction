@@ -8,17 +8,29 @@ const Submission = require('./models/Submission');
 const path = require('path');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
+const fs = require('fs');
 
 const app = express();
+
+// Setup file logging
+const logFile = path.join(__dirname, 'app.log');
+function logToFile(message) {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  fs.appendFileSync(logFile, logMessage, 'utf8');
+  console.log(message);
+}
+
+logToFile('🚀 Server starting...');
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGODB_URI;
 if (!mongoUri) {
-  console.error('MONGODB_URI environment variable not set. Exiting.');
+  logToFile('❌ MONGODB_URI environment variable not set. Exiting.');
   process.exit(1);
 }
 
-console.log('🔗 Connecting to MongoDB...');
+logToFile('🔗 Connecting to MongoDB...');
 let mongoConnected = false;
 
 mongoose.connect(mongoUri, {
@@ -27,14 +39,14 @@ mongoose.connect(mongoUri, {
   serverSelectionTimeoutMS: 10000,
   connectTimeoutMS: 10000
 }).then(() => {
-  console.log('✅ MongoDB connected successfully');
+  logToFile('✅ MongoDB connected successfully');
   mongoConnected = true;
 }).catch(err => {
-  console.error('❌ MongoDB connection error:', err.message);
+  logToFile('❌ MongoDB connection error: ' + err.message);
   // Don't exit immediately, try to reconnect
   setTimeout(() => {
     if (!mongoConnected) {
-      console.error('❌ MongoDB still not connected after retry, exiting');
+      logToFile('❌ MongoDB still not connected after retry, exiting');
       process.exit(1);
     }
   }, 5000);
@@ -63,6 +75,12 @@ app.use(cors());
 app.use(cookieParser());
 app.use(morgan('tiny'));
 
+// Log all requests
+app.use((req, res, next) => {
+  logToFile(`📥 ${req.method} ${req.path}`);
+  next();
+});
+
 // Serve project static files (for local development). This lets you open the site via the server
 const staticRoot = path.join(__dirname, '..');
 app.use(express.static(staticRoot));
@@ -75,23 +93,23 @@ app.get('/_health', (req, res) => res.send({ ok: true }));
 
 // POST endpoint to receive contact form submissions
 app.post('/api/contact', async (req, res) => {
-  console.log('📨 Contact form received:', JSON.stringify(req.body));
-  console.log('🔗 MongoDB connection state:', mongoose.connection.readyState, '(0=disconnected, 1=connected, 2=connecting, 3=disconnecting)');
+  logToFile('📨 Contact form received: ' + JSON.stringify(req.body));
+  logToFile('🔗 MongoDB connection state: ' + mongoose.connection.readyState + ' (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)');
   
   if (mongoose.connection.readyState !== 1) {
-    console.error('❌ MongoDB not connected, readyState:', mongoose.connection.readyState);
+    logToFile('❌ MongoDB not connected, readyState: ' + mongoose.connection.readyState);
     return res.status(503).json({ error: 'Database temporarily unavailable' });
   }
   
   const { name, email, company, message } = req.body || {};
 
   if (!email || !name) {
-    console.log('❌ Validation failed: missing name or email');
+    logToFile('❌ Validation failed: missing name or email');
     return res.status(400).json({ error: 'name and email are required' });
   }
 
   try {
-    console.log('💾 Saving to MongoDB:', { name, email, company, message });
+    logToFile('💾 Saving to MongoDB: ' + JSON.stringify({ name, email, company, message }));
     const submission = new Submission({
       name: name.trim(),
       company: company ? company.trim() : '',
@@ -99,10 +117,10 @@ app.post('/api/contact', async (req, res) => {
       message: message ? message.trim() : ''
     });
     const saved = await submission.save();
-    console.log('✅ Submission saved, ID:', saved._id);
+    logToFile('✅ Submission saved, ID: ' + saved._id);
     res.status(201).json({ id: submission._id, success: true });
   } catch (err) {
-    console.error('❌ DB insert failed:', err.message, err);
+    logToFile('❌ DB insert failed: ' + err.message);
     res.status(500).json({ error: 'internal server error' });
   }
 });
@@ -259,6 +277,6 @@ app.get('/admin.html', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Prefiction server listening on http://localhost:${port}`);
-  console.log(`Serving static files from ${staticRoot}`);
+  logToFile(`✅ Prefiction server listening on http://localhost:${port}`);
+  logToFile(`📁 Serving static files from ${staticRoot}`);
 });
