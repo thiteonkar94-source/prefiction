@@ -359,7 +359,7 @@ function attachContactFormHandler() {
             }
 
             const json = await res.json().catch(() => null);
-            setStatus('Thanks! Your message was delivered (we saved it to the local database).');
+            setStatus('Thanks! Your message was delivered and saved to our database. We\'ll get back to you soon!');
             form.reset();
         } catch (err) {
             console.error('Contact submit error', err);
