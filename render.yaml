@@ -2,6 +2,18 @@ services:
   - type: web
     name: prefiction-web
     env: node
+    plan: free
+    region: oregon
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    healthCheckPath: /_health
+    envVars:
+      - key: PORT
+        value: "3000"
+services:
+  - type: web
+    name: prefiction-web
+    env: node
     region: oregon
     plan: free
     branch: main
