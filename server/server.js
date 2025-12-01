@@ -57,23 +57,27 @@ app.get('/_health', (req, res) => res.send({ ok: true }));
 
 // POST endpoint to receive contact form submissions
 app.post('/api/contact', async (req, res) => {
+  console.log('📨 Contact form received:', JSON.stringify(req.body));
   const { name, email, company, message } = req.body || {};
 
   if (!email || !name) {
+    console.log('❌ Validation failed: missing name or email');
     return res.status(400).json({ error: 'name and email are required' });
   }
 
   try {
+    console.log('💾 Saving to MongoDB:', { name, email, company, message });
     const submission = new Submission({
       name: name.trim(),
       company: company ? company.trim() : '',
       email: email.trim(),
       message: message ? message.trim() : ''
     });
-    await submission.save();
+    const saved = await submission.save();
+    console.log('✅ Submission saved, ID:', saved._id);
     res.status(201).json({ id: submission._id, success: true });
   } catch (err) {
-    console.error('DB insert failed', err);
+    console.error('❌ DB insert failed:', err.message, err);
     res.status(500).json({ error: 'internal server error' });
   }
 });
