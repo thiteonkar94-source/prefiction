@@ -142,8 +142,11 @@ app.get('/admin/submissions', requireAdminAuth, async (req, res) => {
 // Some hosts/proxies may block GET requests to API-like paths; accept POST as a mirror for compatibility
 app.post('/admin/submissions', requireAdminAuth, async (req, res) => {
   try {
+    console.log('[POST /admin/submissions] Fetching submissions...');
     const rows = await Submission.find().sort({ createdAt: -1 });
+    console.log('[POST /admin/submissions] Found', rows.length, 'submissions');
     res.json({ rows });
+    console.log('[POST /admin/submissions] Response sent');
   } catch (err) {
     console.error('DB read failed (POST mirror)', err);
     res.status(500).json({ error: 'internal server error' });
