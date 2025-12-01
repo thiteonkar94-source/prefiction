@@ -368,7 +368,8 @@
         const resp = await fetch('/admin/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password })
+          body: JSON.stringify({ password }),
+          credentials: 'same-origin'
         });
 
         if (!res.ok) {
