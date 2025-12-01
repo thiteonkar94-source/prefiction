@@ -453,6 +453,7 @@
                     <button onclick="setPage('products')" class="footer-link-anim">Case Studies</button>
                     <button onclick="setPage('about')" class="footer-link-anim">About</button>
                     <button onclick="setPage('contact')" class="footer-link-anim">Contact</button>
+                    <a href="/admin.html" class="footer-link-anim-admin">Admin Login</a>
                 </div>
             </div>
         </footer>
@@ -490,6 +491,34 @@
             color: #fff;
             background: linear-gradient(90deg,rgba(251,146,60,0.32),rgba(236,72,153,0.32));
             box-shadow: 0 2px 8px 0 rgba(251,146,60,0.12), 0 1.5px 8px 0 rgba(236,72,153,0.10);
+            transform: scale(0.98);
+        }
+        .footer-link-anim-admin {
+            color: #fff;
+            background: linear-gradient(90deg,rgba(59,130,246,0.18),rgba(99,102,241,0.18));
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.1rem;
+            font-weight: 600;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.18s;
+            box-shadow: 0 2px 8px 0 rgba(59,130,246,0.15);
+            outline: none;
+            border: 1px solid rgba(59,130,246,0.3);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .footer-link-anim-admin:hover, .footer-link-anim-admin:focus {
+            color: #60a5fa;
+            background: linear-gradient(90deg,rgba(59,130,246,0.28),rgba(99,102,241,0.28));
+            box-shadow: 0 4px 16px 0 rgba(59,130,246,0.20), 0 1.5px 8px 0 rgba(99,102,241,0.12);
+            transform: translateY(-2px) scale(1.06);
+            border-color: rgba(59,130,246,0.5);
+        }
+        .footer-link-anim-admin:active {
+            color: #fff;
+            background: linear-gradient(90deg,rgba(59,130,246,0.35),rgba(99,102,241,0.35));
             transform: scale(0.98);
         }
         </style>
