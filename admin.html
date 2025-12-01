@@ -19,6 +19,34 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-600 to-purple-700 min-h-screen p-4 md:p-8">
+  <!-- Password Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div class="glass-panel rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">🔐 Admin Access</h2>
+      <p class="text-gray-600 mb-6">Enter the admin password to continue</p>
+      
+      <div class="mb-4">
+        <input 
+          id="adminPassword" 
+          type="password" 
+          placeholder="Enter admin password" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
+      <div id="loginError" class="mb-4 p-3 rounded-lg hidden bg-red-50 text-red-600 text-sm"></div>
+      
+      <button 
+        id="loginBtn"
+        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg"
+      >
+        Unlock Admin Panel
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Admin Panel (hidden until login) -->
+  <div id="adminPanel" style="display: none;">
   <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <div class="mb-8 text-white">
@@ -275,6 +303,55 @@
         fetchBtn.click();
       }
     });
+
+    // Password Protection
+    const ADMIN_PASSWORD = 'admin123'; // Change this to your desired password
+    const loginModal = document.getElementById('loginModal');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminPassword = document.getElementById('adminPassword');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+
+    function showLoginError(msg) {
+      loginError.textContent = msg;
+      loginError.style.display = 'block';
+    }
+
+    function hideLoginError() {
+      loginError.style.display = 'none';
+      loginError.textContent = '';
+    }
+
+    loginBtn.addEventListener('click', () => {
+      const password = adminPassword.value.trim();
+      if (!password) {
+        showLoginError('Please enter a password');
+        return;
+      }
+      
+      if (password === ADMIN_PASSWORD) {
+        hideLoginError();
+        loginModal.style.display = 'none';
+        adminPanel.style.display = 'block';
+        adminPassword.value = '';
+      } else {
+        showLoginError('❌ Incorrect password. Try again.');
+        adminPassword.value = '';
+      }
+    });
+
+    // Allow Enter key to submit login
+    adminPassword.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loginBtn.click();
+      }
+    });
+
+    // Focus on password field on load
+    window.addEventListener('load', () => {
+      adminPassword.focus();
+    });
   </script>
+  </div>
 </body>
 </html>
