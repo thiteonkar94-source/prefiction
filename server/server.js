@@ -12,7 +12,11 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://prefic_db_user:y2OTxxW2EZ8sKvN7@cluster0.jhomc5v.mongodb.net/prefiction?appName=Cluster0';
+const mongoUri = process.env.MONGODB_URI;
+if (!mongoUri) {
+  console.error('MONGODB_URI environment variable not set. Exiting.');
+  process.exit(1);
+}
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
