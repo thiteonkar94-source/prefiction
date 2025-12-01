@@ -91,6 +91,18 @@ app.use(express.static(path.join(__dirname)));
 // Simple health check
 app.get('/_health', (req, res) => res.send({ ok: true }));
 
+// Health check with MongoDB status
+app.get('/api/health', (req, res) => {
+  const status = {
+    ok: true,
+    mongoConnected: mongoose.connection.readyState === 1,
+    mongoReadyState: mongoose.connection.readyState,
+    timestamp: new Date().toISOString()
+  };
+  logToFile('🏥 Health check: ' + JSON.stringify(status));
+  res.json(status);
+});
+
 // POST endpoint to receive contact form submissions
 app.post('/api/contact', async (req, res) => {
   logToFile('📨 Contact form received: ' + JSON.stringify(req.body));
@@ -116,11 +128,22 @@ app.post('/api/contact', async (req, res) => {
       email: email.trim(),
       message: message ? message.trim() : ''
     });
+    logToFile('🔍 Submission object created');
     const saved = await submission.save();
-    logToFile('✅ Submission saved, ID: ' + saved._id);
-    res.status(201).json({ id: submission._id, success: true });
+    logToFile('✅ Submission saved, ID: ' + saved._id + ', Name: ' + saved.name + ', Email: ' + saved.email);
+    
+    // Verify it was saved by querying it back
+    const verify = await Submission.findById(saved._id);
+    if (verify) {
+      logToFile('✅✅ Verified: Submission exists in DB with ID ' + verify._id);
+    } else {
+      logToFile('⚠️ WARNING: Submission saved but cannot be retrieved immediately');
+    }
+    
+    res.status(201).json({ id: saved._id, success: true });
   } catch (err) {
     logToFile('❌ DB insert failed: ' + err.message);
+    logToFile('❌ Full error: ' + JSON.stringify(err));
     res.status(500).json({ error: 'internal server error' });
   }
 });
