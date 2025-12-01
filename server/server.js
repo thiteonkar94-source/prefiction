@@ -127,6 +127,17 @@ app.get('/admin/submissions', requireAdminAuth, async (req, res) => {
   }
 });
 
+// Allow POST as well for environments that proxy or block GET requests
+app.post('/admin/submissions', requireAdminAuth, async (req, res) => {
+  try {
+    const rows = await Submission.find().sort({ createdAt: -1 });
+    res.json({ rows });
+  } catch (err) {
+    console.error('DB read failed (POST)', err);
+    res.status(500).json({ error: 'internal server error' });
+  }
+});
+
 // DELETE endpoint to remove a submission by ID
 app.delete('/admin/submissions/:id', requireAdminAuth, async (req, res) => {
   try {
