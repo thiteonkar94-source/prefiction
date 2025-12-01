@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://thiteonkar17_db_user:npRsHJV3hJiyWrsA@cluster0.jhomc5v.mongodb.net/?appName=Cluster0';
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://prefic_db_user:y2OTxxW2EZ8sKvN7@cluster0.jhomc5v.mongodb.net/prefiction?appName=Cluster0';
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -168,7 +168,7 @@ app.delete('/admin/submissions/:id', requireAdminAuth, async (req, res) => {
 app.post('/admin/verify', (req, res) => {
   try {
     const password = (req.body && req.body.password) || '';
-    const expected = process.env.ADMIN_PANEL_PASSWORD || 'admin123';
+    const expected = process.env.ADMIN_PANEL_PASSWORD || 'admin1234';
     if (password && password === expected) {
       // create a short-lived session and set an HttpOnly cookie
       try {
