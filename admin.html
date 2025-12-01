@@ -355,7 +355,10 @@
       loginError.textContent = '';
     }
 
-    loginBtn.addEventListener('click', async () => {
+    // Unified verify handler: supports form submit or button click.
+    const loginFormEl = document.getElementById('loginForm');
+    async function doVerify(e) {
+      if (e && e.preventDefault) e.preventDefault();
       const password = adminPassword.value.trim();
       if (!password) {
         showLoginError('Please enter a password');
@@ -372,43 +375,13 @@
           credentials: 'same-origin'
         });
 
-        if (!res.ok) {
-          // Try to extract an error message from JSON or text, but avoid failing on empty bodies
-          let errMsg = res.statusText || 'Request failed';
-          try {
-            const errJson = await res.json();
-            if (errJson && errJson.error) errMsg = errJson.error;
-          } catch (_) {
-            try {
-              const txt = await res.text();
-              if (txt) errMsg = txt;
-            } catch (_) {
-              // ignore
-            }
-          }
-          throw new Error(errMsg);
-        }
-
-        // Safely parse JSON body. Some hosts may return 204/304 or an empty body.
-        let json;
-        const ct = (res.headers.get('content-type') || '').toLowerCase();
-        if (res.status === 204 || res.status === 304) {
-          json = { rows: [] };
-        } else if (ct.includes('application/json')) {
-          try {
-            json = await res.json();
-          } catch (e) {
-            // Fallback to text parse if JSON parsing fails
-            const txt = await res.text().catch(() => '');
-            try { json = txt ? JSON.parse(txt) : { rows: [] }; } catch (_) { json = { rows: [] }; }
-          }
+        if (resp.ok) {
+          hideLoginError();
+          loginModal.style.display = 'none';
+          adminPanel.style.display = 'block';
+          adminPassword.value = '';
         } else {
-          // Unknown content-type: try to parse as text then JSON, otherwise empty
-          const txt = await res.text().catch(() => '');
-          try { json = txt ? JSON.parse(txt) : { rows: [] }; } catch (_) { json = { rows: [] }; }
-        }
-
-        currentData = (json && json.rows) ? json.rows : [];
+          showLoginError('❌ Incorrect password. Try again.');
           adminPassword.value = '';
         }
       } catch (err) {
@@ -418,7 +391,13 @@
         loginBtn.disabled = false;
         loginBtn.textContent = 'Unlock Admin Panel';
       }
-    });
+    }
+
+    if (loginFormEl) {
+      loginFormEl.addEventListener('submit', doVerify);
+    } else {
+      loginBtn.addEventListener('click', doVerify);
+    }
 
     // Allow Enter key to submit login
     adminPassword.addEventListener('keypress', (e) => {
