@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 const Submission = require('./models/Submission');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -73,16 +74,101 @@ app.post('/api/contact', async (req, res) => {
 
 // Basic admin endpoint to list submissions. Protect with a simple header key.
 const ADMIN_KEY = process.env.ADMIN_API_KEY || 'dev-secret';
-app.get('/admin/submissions', async (req, res) => {
-  const key = req.get('x-api-key');
-  if (!key || key !== ADMIN_KEY) return res.status(401).json({ error: 'unauthorized' });
+// In-memory session store for admin sessions (simple, non-persistent)
+const SESSIONS = new Map();
+const SESSION_TTL_MS = 1000 * 60 * 60; // 1 hour
 
+function createSession() {
+  const id = crypto.randomBytes(24).toString('hex');
+  const now = Date.now();
+  const expires = now + SESSION_TTL_MS;
+  SESSIONS.set(id, { createdAt: now, expires });
+  return id;
+}
+
+function isSessionValid(id) {
+  if (!id) return false;
+  const s = SESSIONS.get(id);
+  if (!s) return false;
+  if (Date.now() > s.expires) {
+    SESSIONS.delete(id);
+    return false;
+  }
+  return true;
+}
+
+function requireAdminAuth(req, res, next) {
+  // Allow API key as before
+  const key = req.get('x-api-key');
+  if (key && key === ADMIN_KEY) return next();
+
+  // Otherwise check for admin session cookie
+  const cookieHeader = req.get('cookie') || '';
+  const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('admin_sid='));
+  if (!match) return res.status(401).json({ error: 'unauthorized' });
+  const sid = match.split('=')[1];
+  if (!isSessionValid(sid)) return res.status(401).json({ error: 'unauthorized' });
+  // refresh expiry on activity
+  const sess = SESSIONS.get(sid);
+  sess.expires = Date.now() + SESSION_TTL_MS;
+  SESSIONS.set(sid, sess);
+  next();
+}
+
+app.get('/admin/submissions', requireAdminAuth, async (req, res) => {
   try {
     const rows = await Submission.find().sort({ createdAt: -1 });
     res.json({ rows });
   } catch (err) {
     console.error('DB read failed', err);
     res.status(500).json({ error: 'internal server error' });
+  }
+});
+
+// Verify admin password (used by client-side login modal)
+app.post('/admin/verify', (req, res) => {
+  try {
+    const password = (req.body && req.body.password) || '';
+    const expected = process.env.ADMIN_PANEL_PASSWORD || 'admin123';
+    if (password && password === expected) {
+      // create a short-lived session and set an HttpOnly cookie
+      try {
+        const sid = createSession();
+        const oneHour = SESSION_TTL_MS;
+        // set cookie options; secure only in production when using HTTPS
+        const cookieOpts = {
+          httpOnly: true,
+          sameSite: 'lax',
+          maxAge: oneHour
+        };
+        if (process.env.NODE_ENV === 'production') cookieOpts.secure = true;
+        res.cookie('admin_sid', sid, cookieOpts);
+      } catch (err) {
+        console.error('Session create failed', err);
+      }
+      return res.json({ ok: true });
+    }
+    return res.status(401).json({ error: 'unauthorized' });
+  } catch (err) {
+    console.error('Verify endpoint error', err);
+    return res.status(500).json({ error: 'internal server error' });
+  }
+});
+
+// Logout endpoint to destroy admin session
+app.post('/admin/logout', (req, res) => {
+  try {
+    const cookieHeader = req.get('cookie') || '';
+    const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('admin_sid='));
+    if (match) {
+      const sid = match.split('=')[1];
+      if (sid && SESSIONS.has(sid)) SESSIONS.delete(sid);
+    }
+    res.clearCookie('admin_sid', { httpOnly: true, sameSite: 'lax' });
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('Logout error', err);
+    return res.status(500).json({ error: 'internal server error' });
   }
 });
 

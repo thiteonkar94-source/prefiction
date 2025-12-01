@@ -215,7 +215,8 @@
       fetchBtn.textContent = '⏳ Loading...';
 
       try {
-        const res = await fetch('/admin/submissions', { headers: { 'x-api-key': key } });
+        const fetchOptions = key ? { headers: { 'x-api-key': key }, credentials: 'same-origin' } : { credentials: 'same-origin' };
+        const res = await fetch('/admin/submissions', fetchOptions);
         if (!res.ok) {
           const json = await res.json().catch(() => ({}));
           throw new Error(json?.error || res.statusText);
@@ -304,8 +305,7 @@
       }
     });
 
-    // Password Protection
-    const ADMIN_PASSWORD = 'admin123'; // Change this to your desired password
+    // Password Protection (verify via server endpoint)
     const loginModal = document.getElementById('loginModal');
     const adminPanel = document.getElementById('adminPanel');
     const adminPassword = document.getElementById('adminPassword');
@@ -322,21 +322,37 @@
       loginError.textContent = '';
     }
 
-    loginBtn.addEventListener('click', () => {
+    loginBtn.addEventListener('click', async () => {
       const password = adminPassword.value.trim();
       if (!password) {
         showLoginError('Please enter a password');
         return;
       }
-      
-      if (password === ADMIN_PASSWORD) {
-        hideLoginError();
-        loginModal.style.display = 'none';
-        adminPanel.style.display = 'block';
-        adminPassword.value = '';
-      } else {
-        showLoginError('❌ Incorrect password. Try again.');
-        adminPassword.value = '';
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Checking...';
+      try {
+        const resp = await fetch('/admin/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        if (resp.ok) {
+          hideLoginError();
+          loginModal.style.display = 'none';
+          adminPanel.style.display = 'block';
+          adminPassword.value = '';
+        } else {
+          showLoginError('❌ Incorrect password. Try again.');
+          adminPassword.value = '';
+        }
+      } catch (err) {
+        console.error('Verify request failed', err);
+        showLoginError('Server error. Please try again later.');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Unlock Admin Panel';
       }
     });
 
